@@ -20,10 +20,9 @@ class LauncherAssets:
     def language(self, name: str):
         self._lang = name
         if self._lang == "en_us":
-            return
-        self._translation_now = load(
-            open(ASSETS_HOME / "lang" / f"{self._lang}.json", "r", encoding="utf-8")
-        )
+            self._translation_now = self._translation_en_us
+        if (f := ASSETS_HOME / "lang" / f"{self._lang}.json").is_file():
+            self._translation_now = load(f.open("r", encoding="utf-8"))
 
     def translate(self, name: str, **kwargs: dict) -> str:
         """Get the translation of `name`.
@@ -43,4 +42,4 @@ class LauncherAssets:
             return name
 
 
-__all__ = "LauncherAssets"
+__all__ = "ASSETS_HOME", "LauncherAssets"

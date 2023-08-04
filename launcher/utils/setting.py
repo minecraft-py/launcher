@@ -32,7 +32,7 @@ class Setting(UserDict):
         """Save setting."""
         dump(
             self.data,
-            open(self._file, "w+", encoding="utf-8"),
+            self._file.open("w+", encoding="utf-8"),
             ensure_ascii=False,
             indent=4,
         )

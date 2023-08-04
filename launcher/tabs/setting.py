@@ -1,34 +1,113 @@
-from tkinter import *
-from tkinter.ttk import *
+from json import load
+from threading import Thread
+from tkinter import StringVar
+from tkinter.ttk import Combobox, Frame, Label, Radiobutton
+from typing import Dict
+
+from launcher.assets import ASSETS_HOME
 from launcher.tabs import LauncherTab
+from launcher.utils import *
 
 
 class SettingTab(LauncherTab):
     def __init__(self, master, launcher, **kwargs):
         super().__init__(master, launcher, **kwargs)
         self.tab_name = "setting"
+        self.lang_cache: Dict[str, str] = {}
 
         self.setting_area = Frame(self)
         self.choose_language_label = Label(
             self.setting_area,
-            text=launcher.assets.translate("tab.setting.choose_language"),
-            font="TkTextFont 16",
+            text=self.launcher.assets.translate("tab.setting.choose_language"),
         )
-        self.choose_language_combobox = Combobox(self.setting_area, width=32)
+        self.language = StringVar()
+        self.choose_language_combobox = Combobox(
+            self.setting_area,
+            state="disable",
+            width=32,
+            textvariable=self.language,
+        )
+        self.choose_language_combobox.bind(
+            "<<ComboboxSelected>>", self.on_choose_language_selected
+        )
+        self.choose_language_combobox.set(
+            self.launcher.assets.translate("gui.waiting"),
+        )
         self.appearence_label = Label(
             self.setting_area,
             text=launcher.assets.translate("tab.setting.appearence"),
-            font="TkTextFont 16",
         )
-        self.appearence_combobox = Combobox(self.setting_area, width=20)
+        self.appearence = StringVar(
+            value=self.launcher.setting.get("appearence", "light")
+        )
+        self.appearence_light_radio = Radiobutton(
+            self.setting_area,
+            text=self.launcher.assets.translate("tab.setting.appearence.light"),
+            variable=self.appearence,
+            value="light",
+            command=self.on_appearence_radio_click,
+        )
+        self.appearence_dark_radio = Radiobutton(
+            self.setting_area,
+            text=self.launcher.assets.translate("tab.setting.appearence.dark"),
+            variable=self.appearence,
+            value="dark",
+            command=self.on_appearence_radio_click,
+        )
         self.copyright_label = Label(self, text="Copyright \xa9 2023 minecraftpy team")
 
-        self.setting_area.pack(side=TOP, anchor=NW)
-        self.choose_language_label.grid(row=0, column=0, sticky=W, pady=8)
-        self.choose_language_combobox.grid(row=0, column=1, sticky=W, pady=8)
-        self.appearence_label.grid(row=1, column=0, sticky=W)
-        self.appearence_combobox.grid(row=1, column=1, sticky=W)
-        self.copyright_label.pack(side=BOTTOM, anchor=SE, padx=3, pady=5)
+        self.setting_area.pack(side="top", anchor="nw")
+        self.choose_language_label.grid(row=0, column=0, sticky="w", pady=8)
+        self.choose_language_combobox.grid(
+            row=0, column=1, columnspan=2, sticky="w", padx=5, pady=8
+        )
+        self.appearence_label.grid(row=1, column=0, sticky="w")
+        self.appearence_light_radio.grid(row=1, column=1, sticky="w", padx=5)
+        self.appearence_dark_radio.grid(row=1, column=2, sticky="w")
+        self.copyright_label.pack(side="bottom", anchor="se")
+
+        Thread(target=self.load_languages).start()
+
+    def on_choose_language_selected(self, *event):
+        lang = self.language.get()
+        lang_code = list(self.lang_cache.keys())
+        diaplay_name = list(self.lang_cache.values())
+        now_lang = lang_code[diaplay_name.index(lang)]
+        self.launcher.change_language(now_lang)
+
+    def on_appearence_radio_click(self, *event):
+        self.launcher.setting["appearence"] = self.appearence.get()
+        if self.launcher.setting.get("appearence") == "dark":
+            self.master.tk.call("set_theme", "dark")
+        else:
+            self.master.tk.call("set_theme", "light")
+
+    def change_language(self):
+        self.choose_language_label["text"] = self.launcher.assets.translate(
+            "tab.setting.choose_language"
+        )
+        self.appearence_label["text"] = self.launcher.assets.translate(
+            "tab.setting.appearence"
+        )
+        self.appearence_light_radio["text"] = self.launcher.assets.translate(
+            "tab.setting.appearence.light"
+        )
+        self.appearence_dark_radio["text"] = self.launcher.assets.translate(
+            "tab.setting.appearence.dark"
+        )
+
+    def load_languages(self):
+        values = []
+        for f in (ASSETS_HOME / "lang").glob("*.json"):
+            content = load(f.open("r", encoding="utf-8"))
+            display_name = f"{content['language.name']}({content['language.region']})"
+            self.lang_cache.setdefault(content["language.code"], display_name)
+            values.append(display_name)
+        self.choose_language_combobox["values"] = values
+        self.choose_language_combobox.set(
+            self.lang_cache[self.launcher.assets.language]
+        )
+        self.choose_language_combobox["state"] = "readonly"
 
 
 __all__ = "SettingTab"

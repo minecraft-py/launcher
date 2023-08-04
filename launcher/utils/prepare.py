@@ -11,17 +11,17 @@ def first_run():
     data_path = get_data_path()
     settings_path = get_settings_path()
 
-    if not data_path.exists:
+    if not data_path.exists():
         data_path.mkdir()
-    if not settings_path.exists:
+    if not settings_path.exists():
         settings_path.mkdir()
 
     for subpath in ["cache", "versions"]:
-        if not (data_path / subpath).exists:
+        if not (data_path / subpath).exists():
             (data_path / subpath).mkdir()
 
     if not (f := settings_path / "setting.json").exists:
-        dump(DEFAULT_SETTING, open(f, "w+"))
+        dump(DEFAULT_SETTING, f.open("w+"))
 
 
 __all__ = "first_run"

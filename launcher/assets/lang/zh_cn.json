@@ -2,8 +2,11 @@
     "language.name": "简体中文",
     "language.region": "中国大陆",
     "language.code": "zh_cn",
+    "gui.waiting": "请稍等...",
     "root.title": "Minecraftpy启动器",
     "tab.setting.name": "设置",
     "tab.setting.appearence": "外观：",
+    "tab.setting.appearence.light": "明亮",
+    "tab.setting.appearence.dark": "黑暗",
     "tab.setting.choose_language": "选择语言："
 }

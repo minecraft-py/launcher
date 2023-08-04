@@ -2,8 +2,11 @@
     "language.name": "English",
     "language.region": "United States",
     "language.code": "en_us",
+    "gui.waiting": "Wait for a moment...",
     "root.title": "Minecraftpy Launcher",
     "tab.setting.name": "Setting",
     "tab.setting.appearence": "Appearence:",
+    "tab.setting.appearence.light": "Light",
+    "tab.setting.appearence.dark": "Dark",
     "tab.setting.choose_language": "Choose language:"
 }
