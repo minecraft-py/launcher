@@ -8,5 +8,8 @@
     "tab.setting.appearence": "Appearence:",
     "tab.setting.appearence.light": "Light",
     "tab.setting.appearence.dark": "Dark",
-    "tab.setting.choose_language": "Choose language:"
+    "tab.setting.basic_settings": "Basic Settings",
+    "tab.setting.choose_language": "Choose language:",
+    "tab.setting.cmdline_args": "Command line\nargument:",
+    "tab.setting.interpreter_verion": "Interpreter version:"
 }

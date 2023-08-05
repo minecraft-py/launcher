@@ -8,5 +8,8 @@
     "tab.setting.appearence": "外观：",
     "tab.setting.appearence.light": "明亮",
     "tab.setting.appearence.dark": "黑暗",
-    "tab.setting.choose_language": "选择语言："
+    "tab.setting.basic_settings": "基本设置",
+    "tab.setting.choose_language": "选择语言：",
+    "tab.setting.cmdline_args": "命令行参数：",
+    "tab.setting.interpreter_verion": "解释器版本："
 }

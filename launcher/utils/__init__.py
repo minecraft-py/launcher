@@ -16,7 +16,7 @@ def get_settings_path() -> Path:
     From `pyglet.resource.get_settings_path`.
     """
     name = "minecraftpy-launcher"
-    HOME = Path.home
+    HOME = Path.home()
     if compat_platform in ("cygwin", "win32"):
         if "APPDATA" in os.environ:
             return Path(os.environ["APPDATA"]) / name
@@ -40,7 +40,7 @@ def get_data_path() -> Path:
     From `pyglet.resource.get_data_path`.
     """
     name = "minecraftpy-launcher"
-    HOME = Path.home
+    HOME = Path.home()
     if compat_platform in ("cygwin", "win32"):
         if "APPDATA" in os.environ:
             return Path(os.environ["APPDATA"]) / name

@@ -1,7 +1,8 @@
+import sys
 from json import load
 from threading import Thread
 from tkinter import StringVar
-from tkinter.ttk import Combobox, Frame, Label, Radiobutton
+from tkinter.ttk import Combobox, Label, LabelFrame, Radiobutton
 from typing import Dict
 
 from launcher.assets import ASSETS_HOME
@@ -15,14 +16,16 @@ class SettingTab(LauncherTab):
         self.tab_name = "setting"
         self.lang_cache: Dict[str, str] = {}
 
-        self.setting_area = Frame(self)
+        self.basic_settings = LabelFrame(
+            self, text=self.launcher.assets.translate("tab.setting.basic_settings")
+        )
         self.choose_language_label = Label(
-            self.setting_area,
+            self.basic_settings,
             text=self.launcher.assets.translate("tab.setting.choose_language"),
         )
         self.language = StringVar()
         self.choose_language_combobox = Combobox(
-            self.setting_area,
+            self.basic_settings,
             state="disable",
             width=32,
             textvariable=self.language,
@@ -34,37 +37,55 @@ class SettingTab(LauncherTab):
             self.launcher.assets.translate("gui.waiting"),
         )
         self.appearence_label = Label(
-            self.setting_area,
+            self.basic_settings,
             text=launcher.assets.translate("tab.setting.appearence"),
         )
         self.appearence = StringVar(
             value=self.launcher.setting.get("appearence", "light")
         )
         self.appearence_light_radio = Radiobutton(
-            self.setting_area,
+            self.basic_settings,
             text=self.launcher.assets.translate("tab.setting.appearence.light"),
             variable=self.appearence,
             value="light",
             command=self.on_appearence_radio_click,
         )
         self.appearence_dark_radio = Radiobutton(
-            self.setting_area,
+            self.basic_settings,
             text=self.launcher.assets.translate("tab.setting.appearence.dark"),
             variable=self.appearence,
             value="dark",
             command=self.on_appearence_radio_click,
         )
+        self.python_settings = LabelFrame(self, text="Python")
+        self.version_label = Label(
+            self.python_settings,
+            text=self.launcher.assets.translate("tab.setting.interpreter_verion"),
+        )
+        self.version_combobox = Combobox(
+            self.python_settings, state="disable", width=32
+        )
+        self.version_combobox.set(
+            self.launcher.assets.translate("gui.waiting"),
+        )
+        self.interpreter_path = Label(
+            self.python_settings, text=sys.executable, wraplength=225
+        )
         self.copyright_label = Label(self, text="Copyright \xa9 2023 minecraftpy team")
 
-        self.setting_area.pack(side="top", anchor="nw")
-        self.choose_language_label.grid(row=0, column=0, sticky="w", pady=8)
-        self.choose_language_combobox.grid(
-            row=0, column=1, columnspan=2, sticky="w", padx=5, pady=8
-        )
-        self.appearence_label.grid(row=1, column=0, sticky="w")
-        self.appearence_light_radio.grid(row=1, column=1, sticky="w", padx=5)
-        self.appearence_dark_radio.grid(row=1, column=2, sticky="w")
+        self.basic_settings.pack(side="top", anchor="nw", fill="x", padx=3, pady=3)
+        self.python_settings.pack(side="top", anchor="nw", fill="x", padx=3, pady=3)
         self.copyright_label.pack(side="bottom", anchor="se")
+        self.choose_language_label.grid(row=0, column=0, sticky="w", padx=5, pady=5)
+        self.choose_language_combobox.grid(
+            row=0, column=1, columnspan=2, sticky="w", padx=5, pady=5
+        )
+        self.appearence_label.grid(row=1, column=0, sticky="w", padx=5, pady=5)
+        self.appearence_light_radio.grid(row=1, column=1, sticky="w", padx=5, pady=5)
+        self.appearence_dark_radio.grid(row=1, column=2, sticky="w")
+        self.version_label.grid(row=0, column=0, sticky="w", padx=5, pady=5)
+        self.version_combobox.grid(row=0, column=1, sticky="w", padx=5, pady=5)
+        self.interpreter_path.grid(row=1, column=1, sticky="w", padx=5, pady=5)
 
         Thread(target=self.load_languages).start()
 
@@ -83,6 +104,9 @@ class SettingTab(LauncherTab):
             self.master.tk.call("set_theme", "light")
 
     def change_language(self):
+        self.basic_settings["text"] = self.launcher.assets.translate(
+            "tab.settings.basic_settings"
+        )
         self.choose_language_label["text"] = self.launcher.assets.translate(
             "tab.setting.choose_language"
         )
@@ -94,6 +118,9 @@ class SettingTab(LauncherTab):
         )
         self.appearence_dark_radio["text"] = self.launcher.assets.translate(
             "tab.setting.appearence.dark"
+        )
+        self.version_label["text"] = self.launcher.assets.translate(
+            "tab.setting.interpreter_verion"
         )
 
     def load_languages(self):
