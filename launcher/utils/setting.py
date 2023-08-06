@@ -3,7 +3,7 @@ from json import dump, load
 
 from launcher.utils import *
 
-DEFAULT_SETTING = {"language": "<auto>", "appearence": "light"}
+DEFAULT_SETTING = {"language": "<auto>", "appearence": "light", "cmdline": "-OO"}
 
 
 class Setting(UserDict):

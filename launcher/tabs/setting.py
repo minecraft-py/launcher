@@ -1,8 +1,7 @@
-import sys
 from json import load
 from threading import Thread
 from tkinter import StringVar
-from tkinter.ttk import Combobox, Label, LabelFrame, Radiobutton
+from tkinter.ttk import Combobox, Entry, Label, LabelFrame, Radiobutton
 from typing import Dict
 
 from launcher.assets import ASSETS_HOME
@@ -23,12 +22,10 @@ class SettingTab(LauncherTab):
             self.basic_settings,
             text=self.launcher.assets.translate("tab.setting.choose_language"),
         )
-        self.language = StringVar()
         self.choose_language_combobox = Combobox(
             self.basic_settings,
-            state="disable",
+            state="readonly",
             width=32,
-            textvariable=self.language,
         )
         self.choose_language_combobox.bind(
             "<<ComboboxSelected>>", self.on_choose_language_selected
@@ -62,19 +59,22 @@ class SettingTab(LauncherTab):
             self.python_settings,
             text=self.launcher.assets.translate("tab.setting.interpreter_verion"),
         )
-        self.version_combobox = Combobox(
-            self.python_settings, state="disable", width=32
-        )
+        self.version_combobox = Combobox(self.python_settings, state="disable")
         self.version_combobox.set(
             self.launcher.assets.translate("gui.waiting"),
         )
-        self.interpreter_path = Label(
-            self.python_settings, text=sys.executable, wraplength=225
+        self.cmdline_label = Label(
+            self.python_settings,
+            text=self.launcher.assets.translate("tab.setting.cmdline_args"),
         )
+        self.cmdline_args = StringVar(value=self.launcher.setting.get("cmdline", ""))
+        self.cmdline_entry = Entry(self.python_settings, textvariable=self.cmdline_args)
+        self.cmdline_args.trace_add("write", self.save_cmdline)
         self.copyright_label = Label(self, text="Copyright \xa9 2023 minecraftpy team")
 
         self.basic_settings.pack(side="top", anchor="nw", fill="x", padx=3, pady=3)
         self.python_settings.pack(side="top", anchor="nw", fill="x", padx=3, pady=3)
+        self.python_settings.columnconfigure(1, weight=1, minsize=256)
         self.copyright_label.pack(side="bottom", anchor="se")
         self.choose_language_label.grid(row=0, column=0, sticky="w", padx=5, pady=5)
         self.choose_language_combobox.grid(
@@ -84,13 +84,14 @@ class SettingTab(LauncherTab):
         self.appearence_light_radio.grid(row=1, column=1, sticky="w", padx=5, pady=5)
         self.appearence_dark_radio.grid(row=1, column=2, sticky="w")
         self.version_label.grid(row=0, column=0, sticky="w", padx=5, pady=5)
-        self.version_combobox.grid(row=0, column=1, sticky="w", padx=5, pady=5)
-        self.interpreter_path.grid(row=1, column=1, sticky="w", padx=5, pady=5)
+        self.version_combobox.grid(row=0, column=1, sticky="we", padx=5, pady=5)
+        self.cmdline_label.grid(row=1, column=0, sticky="w", padx=5, pady=5)
+        self.cmdline_entry.grid(row=1, column=1, sticky="we", padx=5, pady=5)
 
         Thread(target=self.load_languages).start()
 
     def on_choose_language_selected(self, *event):
-        lang = self.language.get()
+        lang = self.choose_language_combobox.get()
         lang_code = list(self.lang_cache.keys())
         diaplay_name = list(self.lang_cache.values())
         now_lang = lang_code[diaplay_name.index(lang)]
@@ -122,6 +123,9 @@ class SettingTab(LauncherTab):
         self.version_label["text"] = self.launcher.assets.translate(
             "tab.setting.interpreter_verion"
         )
+        self.cmdline_label["text"] = self.launcher.assets.translate(
+            "tab.setting.cmdline_args"
+        )
 
     def load_languages(self):
         values = []
@@ -135,6 +139,9 @@ class SettingTab(LauncherTab):
             self.lang_cache[self.launcher.assets.language]
         )
         self.choose_language_combobox["state"] = "readonly"
+
+    def save_cmdline(self, *args):
+        self.launcher.setting["cmdline"] = self.cmdline_args.get()
 
 
 __all__ = "SettingTab"
